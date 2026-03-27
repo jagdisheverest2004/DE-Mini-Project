@@ -1,0 +1,75 @@
+resources:
+  jobs:
+    Medical_Data_Pipeline:
+      name: Medical_Data_Pipeline
+      tasks:
+        - task_key: Bronze-Ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/01_bronze/nb_data_ingestion_bronze
+            source: WORKSPACE
+        - task_key: Transform-Encounters
+          depends_on:
+            - task_key: Bronze-Ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/02_silver/nb_trn_encounters
+            source: WORKSPACE
+        - task_key: Transform-Organizations
+          depends_on:
+            - task_key: Bronze-Ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/02_silver/nb_trn_organizations
+            source: WORKSPACE
+        - task_key: Transform-Patients
+          depends_on:
+            - task_key: Bronze-Ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/02_silver/nb_trn_patients
+            source: WORKSPACE
+        - task_key: Transform-Payers
+          depends_on:
+            - task_key: Bronze-Ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/02_silver/nb_trn_payers
+            source: WORKSPACE
+        - task_key: Transform-Procedures
+          depends_on:
+            - task_key: Bronze-Ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/02_silver/nb_trn_procedures
+            source: WORKSPACE
+        - task_key: Dimension_Tables
+          depends_on:
+            - task_key: Transform-Procedures
+            - task_key: Transform-Payers
+            - task_key: Transform-Organizations
+            - task_key: Transform-Encounters
+            - task_key: Transform-Patients
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/03_gold/nb_dim_tables
+            source: WORKSPACE
+        - task_key: Fact_Tables
+          depends_on:
+            - task_key: Transform-Procedures
+            - task_key: Transform-Payers
+            - task_key: Transform-Organizations
+            - task_key: Transform-Encounters
+            - task_key: Transform-Patients
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/03_gold/nb_fact_tables
+            source: WORKSPACE
+        - task_key: Data-Cube
+          depends_on:
+            - task_key: Fact_Tables
+            - task_key: Dimension_Tables
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/03_gold/nb_data_cube
+            source: WORKSPACE
+        - task_key: Kpi-Tables
+          depends_on:
+            - task_key: Data-Cube
+          notebook_task:
+            notebook_path: /Workspace/Users/jagdishswara@gmail.com/DE-Mini-Project/03_gold/nb_kpis
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
